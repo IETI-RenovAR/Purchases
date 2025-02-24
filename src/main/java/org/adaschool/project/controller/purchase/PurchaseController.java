@@ -29,7 +29,12 @@ public class PurchaseController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Purchase> getPurchaseById(@PathVariable("id") String id) {
-        Purchase purchase = purchaseService.getPurchaseById(id);
+        Purchase purchase = null;
+        try {
+            purchase = purchaseService.getPurchaseById(id);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(purchase);
     }
 
