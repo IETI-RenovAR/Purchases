@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/purchases")
@@ -50,4 +51,19 @@ public class PurchaseController {
         purchaseService.deletePurchase(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/shoppingCart/{id}")
+    public Map<String, List<String>> getShoppingCart(@PathVariable String id){
+        return purchaseService.getProductsById(id);
+    }
+
+    @PostMapping("/shoppingCart")
+    public ResponseEntity<String> addToShoppingCart(@RequestBody Map<String, String> request) {
+        String idUser = request.get("idUser");
+        String idProduct = request.get("idProduct");
+        purchaseService.addProductShoppingCart(idUser, idProduct);
+        return ResponseEntity.ok(idProduct);
+    }
+
+
 }

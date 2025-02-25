@@ -12,15 +12,13 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class PurchaseService {
 
+    private Map<String, List<String>> shoppingCart = new HashMap<>();
     private final PurchaseRepository purchaseRepository;
 
     @Autowired
@@ -47,27 +45,25 @@ public class PurchaseService {
         purchase.setQuantity(purchaseDTO.getQuantity());
         purchase.setTotalPrice(purchaseDTO.getTotalPrice());
         purchase.setPurchaseDate(new Date());
-
         return purchaseRepository.save(purchase);
     }
 
-    public Map<String, List<Purchase>> groupPurchasesBySeller(List<Purchase> purchases) {
-        return purchases.stream()
-                .collect(Collectors.groupingBy(
-                        purchase -> {
-                            try {
-                                return getSellerForProduct(purchase.getProductId());
-                            } catch (IOException | InterruptedException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                ));
+    private Map<String, List<String>> groupProductsBySeller(List<String> products) {
+        return products.stream()
+                .collect(Collectors.groupingBy(product -> {
+                    try {
+                        return getSellerForProduct(product);
+                    } catch (IOException | InterruptedException e) {
+                        e.printStackTrace();
+                        return "UnknownSeller";
+                    }
+                }));
     }
 
     private String getSellerForProduct(String productId) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/api")) //cambiar url
+                .uri(URI.create("http://10.0.0.2:8080/v1/products/seller/" + productId)) //cambiar url
                 .GET()
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -77,4 +73,20 @@ public class PurchaseService {
     public void deletePurchase(String id) {
         purchaseRepository.deleteById(id);
     }
+
+    public void addProductShoppingCart(String idUser, String idProduct){
+        List<String> shopping = shoppingCart.get(idUser);
+        if(shopping == null){shopping = new ArrayList<>();}
+        shopping.add(idProduct);
+        shoppingCart.put(idUser, shopping);
+    }
+
+    public Map<String, List<String>> getProductsById(String id){
+        return sortProducts(shoppingCart.get(id));
+    }
+
+    public Map<String, List<String>> sortProducts(List<String> products){
+        return groupProductsBySeller(products);
+    }
+
 }
