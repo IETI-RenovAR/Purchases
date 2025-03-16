@@ -49,7 +49,7 @@ public class PurchaseController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePurchase(@PathVariable("id") String id) {
         purchaseService.deletePurchase(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/shoppingCart/{id}")
