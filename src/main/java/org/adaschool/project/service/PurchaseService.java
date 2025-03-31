@@ -1,19 +1,23 @@
 package org.adaschool.project.service;
 
-import org.adaschool.project.dto.PurchaseDTO;
-import org.adaschool.project.exception.PurchaseNotFoundException;
-import org.adaschool.project.model.Purchase;
-import org.adaschool.project.repository.PurchaseRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.adaschool.project.dto.PurchaseDTO;
+import org.adaschool.project.model.Purchase;
+import org.adaschool.project.repository.PurchaseRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class PurchaseService {
@@ -63,7 +67,7 @@ public class PurchaseService {
     private String getSellerForProduct(String productId) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://10.0.0.2:8080/v1/products/seller/" + productId)) //cambiar url
+                .uri(URI.create("http://20.83.172.95:8082/v1/products/seller/" + productId)) //cambiar url
                 .GET()
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
